@@ -11,6 +11,7 @@ use Magento\Framework\Exception\AlreadyExistsException;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\ResourceModel\Quote as QuoteResourceModel;
+use Magento\Framework\Exception\LocalizedException;
 
 class ShippingAddressChanger
 {
@@ -68,6 +69,9 @@ class ShippingAddressChanger
                 if (strpos($shippingAddress->getShippingMethod(), Inpost::CARRIER_CODE) !== false)
                 {
                     $inpostPointId = $shippingAddress->getInpostPointId();
+                    if (!$inpostPointId) {
+                        throw new LocalizedException(__("InPost point ID not defined."));
+                    }
                     $request = $this->pointsServiceRequestFactory->create();
                     $request->setName($inpostPointId);
                     if ($result = $this->pointsApiService->getPoints($request)->getFirstItem()) {
